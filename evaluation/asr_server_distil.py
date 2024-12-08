@@ -20,21 +20,15 @@ from fastapi.responses import JSONResponse, Response
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--model_size", type=str, default=-1)
+parser.add_argument("--model_path", type=str)
 parser.add_argument("--srate", type=int, default=16000)
 parser.add_argument("--device", type=int, default=0)
 args, unknown_args = parser.parse_known_args()
-assert args.model_size in ["tiny", "small", "medium", "large-v3", "distil-large-v3"], "Invalid model size"
-cprint(f"args: {args.model_size}", "green")
+cprint(f"args: {args.model_path}", "green")
 MIN_LAG_WORDS = 2
-if args.model_size in ["tiny", "small", "medium"]:
-    ASR_MODEL_NAME = f"openai/whisper-{args.model_size}.en"  # "openai/whisper-tiny.en" # "openai/whisper-small.en" "openai/whisper-large-v2"
-elif args.model_size == "large-v3":
-    ASR_MODEL_NAME = "openai/whisper-large-v3"
-elif args.model_size == "distil-large-v3":
-    ASR_MODEL_NAME = "distil-whisper/distil-large-v3"
-else:
-    raise ValueError("Invalid model size")
+DEVICE = f"cuda:{args.device}"
+SRATE = args.srate
+ASR_MODEL_NAME=args.model_path
 DEVICE = f"cuda:{args.device}"
 SRATE = args.srate
 

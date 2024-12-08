@@ -1,6 +1,7 @@
 #!/bin/bash
 
-ASR_MODEL=distil-large-v3
+ASR_MODEL=/120090131/distil-whisper-large-v3/
+LLM_MODEL=/120090131/Meta-Llama-3-8B-Instruct/
 echo "ASR model: $ASR_MODEL"
 
 echo "\n******** 🔥🔥 ${red}Make sure that vLLM runs${reset} ${green} $MODEL_ID${reset} 🔥🔥 ********\n"
@@ -35,11 +36,11 @@ for TGT_LANG in de fr es ru it; do
                     --use_api \
                     --latency-metrics LAAL AL AP DAL \
                     --quality-metrics BLEU CHRF \
-                    --model_id meta-llama/Meta-Llama-3-70B-Instruct \
+                    --model_path $LLM_MODEL \
                     --source-segment-size 200 \
                     --min_read_time $MIN_READ_TIME \
                     --use_asr_api \
-                    --asr_model_size $ASR_MODEL \
+                    --asr_model_path $ASR_MODEL \
                     --min_lag_words 1 \
                     --prompt_id 1 \
                     --func_wrds $FUNC_WORDS \
@@ -59,11 +60,11 @@ for TGT_LANG in de fr es ru it; do
                     --use_api \
                     --latency-metrics LAAL AL AP DAL \
                     --quality-metrics BLEU CHRF \
-                    --model_id meta-llama/Meta-Llama-3-70B-Instruct \
+                    --model_path $LLM_MODEL \
                     --source-segment-size 200 \
                     --min_read_time $MIN_READ_TIME \
                     --use_asr_api \
-                    --asr_model_size $ASR_MODEL \
+                    --asr_model_path $ASR_MODEL \
                     --min_lag_words 1 \
                     --prompt_id 1 \
                     --func_wrds $FUNC_WORDS \

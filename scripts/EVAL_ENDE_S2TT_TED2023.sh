@@ -1,9 +1,8 @@
 #!/bin/bash
 
-ASR_MODEL=distil-large-v3
+ASR_MODEL=/120090131/distil-whisper-large-v3/
+LLM_MODEL=/120090131/Meta-Llama-3-8B-Instruct/
 echo "ASR model: $ASR_MODEL"
-
-MODEL_ID=meta-llama/Meta-Llama-3-70B-Instruct
 
 
 red='\033[31m'
@@ -43,10 +42,10 @@ for TGT_LANG in de; do
                     --use_api \
                     --latency-metrics LAAL AL AP DAL \
                     --quality-metrics BLEU CHRF \
-                    --model_id $MODEL_ID \
+                    --model_path $MODEL_ID \
                     --source-segment-size 200 \
                     --use_asr_api \
-                    --asr_model_size $ASR_MODEL \
+                    --asr_model_path $ASR_MODEL \
                     --prompt_id $PROMPT_ID \
                     --func_wrds $FUNC_WORDS \
                     --priming
@@ -65,10 +64,10 @@ for TGT_LANG in de; do
                     --use_api \
                     --latency-metrics LAAL AL AP DAL \
                     --quality-metrics BLEU CHRF \
-                    --model_id $MODEL_ID \
+                    --model_path $MODEL_ID \
                     --source-segment-size 200 \
                     --use_asr_api \
-                    --asr_model_size $ASR_MODEL \
+                    --asr_model_path $ASR_MODEL \
                     --prompt_id $PROMPT_ID \
                     --func_wrds $FUNC_WORDS \
                     --priming
