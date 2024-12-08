@@ -23,7 +23,7 @@ sys.path.append("../")
 
 import jax.numpy as jnp
 from jax import jit
-from whisper_jax import FlaxWhisperForConditionalGeneration
+#from whisper_jax import FlaxWhisperForConditionalGeneration
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor
 from utils.utils import update_source_word_list, purge_directory, parse_language_pair
 from chat_templates.templates import PROMPT_TEMPLATES
@@ -40,7 +40,7 @@ from scipy.io.wavfile import write as wav_write
 # from configs import config_1 as CONFIG
 parser = argparse.ArgumentParser()
 parser.add_argument("--config_id", type=int, default=-1)
-parser.add_argument("--model_id", type=str, default="")
+parser.add_argument("--model_path", type=str, default="")
 parser.add_argument("--verbose", action="store_true")
 parser.add_argument("--use_api", action="store_true")
 parser.add_argument("--device", type=int, default=0)
@@ -48,7 +48,7 @@ parser.add_argument("--k", type=int, default=4)
 parser.add_argument("--dir", type=str, default=None)
 parser.add_argument("--output", type=str, default=None)
 parser.add_argument("--use_asr_api", action="store_true")
-parser.add_argument("--asr_model_size", type=str, default="small")
+parser.add_argument("--asr_model_path", type=str, default="small")
 parser.add_argument("--prompt_id", type=int, default=0)
 parser.add_argument("--bgd_info", action="store_true")
 parser.add_argument("--min_read_time", type=float, default=0)
@@ -74,64 +74,67 @@ ASR_ENDPOINT = os.environ["ASR_SERVER_ENDPOINT_URL"]
 print(ENDPOINT)
 print(ASR_ENDPOINT)
 
-ASR_MODEL_SIZE = args.asr_model_size
-
-# FIXME: these should be CLI arguments
-ASR_MODEL_NAME = f"openai/whisper-{ASR_MODEL_SIZE}.en"  # "openai/whisper-tiny.en" # "openai/whisper-small.en" "openai/whisper-large-v2"
-if ASR_MODEL_SIZE == "large-v3":
-    ASR_MODEL_NAME = "openai/whisper-large-v3"
-if ASR_MODEL_SIZE == "distil-large-v3":
-    ASR_MODEL_NAME = "distil-whisper/distil-large-v3"
-
+#ASR_MODEL_SIZE = args.asr_model_size
+#
+## FIXME: these should be CLI arguments
+#ASR_MODEL_NAME = f"openai/whisper-{ASR_MODEL_SIZE}.en"  # "openai/whisper-tiny.en" # "openai/whisper-small.en" "openai/whisper-large-v2"
+#if ASR_MODEL_SIZE == "large-v3":
+#    ASR_MODEL_NAME = "openai/whisper-large-v3"
+#if ASR_MODEL_SIZE == "distil-large-v3":
+#    ASR_MODEL_NAME = "distil-whisper/distil-large-v3"
+ASR_MODEL_NAME=args.asr_model_path
 SRATE = 16000
 MIN_LAG_WORDS = int(args.min_lag_words)
 MIN_READ_TIME = float(args.min_read_time)
 RESPONSE_PRIMING = bool(args.priming)
 cprint(f"RESPONSE_PRIMING: {RESPONSE_PRIMING}", "black", "on_light_magenta")
 
-if args.model_id == "meta-llama/Llama-2-13b-chat-hf":
-    ACCEPTS_SYSTEM_MESSAGE = True
-    TOKENIZATION_SPACE = "▁"
-    EOT_TOKEN_SEQUENCE = ["[/INST]", "</s>"]
-elif args.model_id == "microsoft/Orca-2-7b":
-    ACCEPTS_SYSTEM_MESSAGE = True
-    TOKENIZATION_SPACE = "▁"
-    EOT_TOKEN_SEQUENCE = ["[/INST]", "</s>"]
-elif args.model_id == "meta-llama/Meta-Llama-3-8B-Instruct":
-    ACCEPTS_SYSTEM_MESSAGE = True
-    TOKENIZATION_SPACE = "Ġ"
-    EOT_TOKEN_SEQUENCE = ["<|eot_id|>"]
-elif args.model_id == "meta-llama/Meta-Llama-3-70B-Instruct":
-    ACCEPTS_SYSTEM_MESSAGE = True
-    TOKENIZATION_SPACE = "Ġ"
-    EOT_TOKEN_SEQUENCE = ["<|eot_id|>"]
-elif args.model_id == "casperhansen/llama-3-8b-instruct-awq":
-    ACCEPTS_SYSTEM_MESSAGE = True
-    TOKENIZATION_SPACE = "Ġ"
-    EOT_TOKEN_SEQUENCE = ["<|eot_id|>"]
-elif args.model_id == "casperhansen/llama-3-70b-instruct-awq":
-    ACCEPTS_SYSTEM_MESSAGE = True
-    TOKENIZATION_SPACE = "Ġ"
-    EOT_TOKEN_SEQUENCE = ["<|eot_id|>"]
-elif args.model_id == "microsoft/Phi-3-mini-4k-instruct":
-    ACCEPTS_SYSTEM_MESSAGE = True
-    TOKENIZATION_SPACE = "▁"
-    EOT_TOKEN_SEQUENCE = ["<|end|>", "<|endoftext|>"]
-elif args.model_id == "google/gemma-7b-it":
-    ACCEPTS_SYSTEM_MESSAGE = False
-    TOKENIZATION_SPACE = "▁"
-    EOT_TOKEN_SEQUENCE = ["<end_of_turn>", "<eos>"]
-elif args.model_id == "mistralai/Mistral-7B-Instruct-v0.2":
-    ACCEPTS_SYSTEM_MESSAGE = False
-    TOKENIZATION_SPACE = "▁"
-    EOT_TOKEN_SEQUENCE = ["[/INST]", "</s>"]
-elif args.model_id == "mistralai/Mistral-7B-Instruct-v0.1":
-    ACCEPTS_SYSTEM_MESSAGE = False
-    TOKENIZATION_SPACE = "▁"
-    EOT_TOKEN_SEQUENCE = ["[/INST]", "</s>"]
-else:
-    raise RuntimeError("Unknown model id")
-model_id = args.model_id
+#if args.model_id == "meta-llama/Llama-2-13b-chat-hf":
+#    ACCEPTS_SYSTEM_MESSAGE = True
+#    TOKENIZATION_SPACE = "▁"
+#    EOT_TOKEN_SEQUENCE = ["[/INST]", "</s>"]
+#elif args.model_id == "microsoft/Orca-2-7b":
+#    ACCEPTS_SYSTEM_MESSAGE = True
+#    TOKENIZATION_SPACE = "▁"
+#    EOT_TOKEN_SEQUENCE = ["[/INST]", "</s>"]
+#elif args.model_id == "meta-llama/Meta-Llama-3-8B-Instruct":
+#    ACCEPTS_SYSTEM_MESSAGE = True
+#    TOKENIZATION_SPACE = "Ġ"
+#    EOT_TOKEN_SEQUENCE = ["<|eot_id|>"]
+#elif args.model_id == "meta-llama/Meta-Llama-3-70B-Instruct":
+#    ACCEPTS_SYSTEM_MESSAGE = True
+#    TOKENIZATION_SPACE = "Ġ"
+#    EOT_TOKEN_SEQUENCE = ["<|eot_id|>"]
+#elif args.model_id == "casperhansen/llama-3-8b-instruct-awq":
+#    ACCEPTS_SYSTEM_MESSAGE = True
+#    TOKENIZATION_SPACE = "Ġ"
+#    EOT_TOKEN_SEQUENCE = ["<|eot_id|>"]
+#elif args.model_id == "casperhansen/llama-3-70b-instruct-awq":
+#    ACCEPTS_SYSTEM_MESSAGE = True
+#    TOKENIZATION_SPACE = "Ġ"
+#    EOT_TOKEN_SEQUENCE = ["<|eot_id|>"]
+#elif args.model_id == "microsoft/Phi-3-mini-4k-instruct":
+#    ACCEPTS_SYSTEM_MESSAGE = True
+#    TOKENIZATION_SPACE = "▁"
+#    EOT_TOKEN_SEQUENCE = ["<|end|>", "<|endoftext|>"]
+#elif args.model_id == "google/gemma-7b-it":
+#    ACCEPTS_SYSTEM_MESSAGE = False
+#    TOKENIZATION_SPACE = "▁"
+#    EOT_TOKEN_SEQUENCE = ["<end_of_turn>", "<eos>"]
+#elif args.model_id == "mistralai/Mistral-7B-Instruct-v0.2":
+#    ACCEPTS_SYSTEM_MESSAGE = False
+#    TOKENIZATION_SPACE = "▁"
+#    EOT_TOKEN_SEQUENCE = ["[/INST]", "</s>"]
+#elif args.model_id == "mistralai/Mistral-7B-Instruct-v0.1":
+#    ACCEPTS_SYSTEM_MESSAGE = False
+#    TOKENIZATION_SPACE = "▁"
+#    EOT_TOKEN_SEQUENCE = ["[/INST]", "</s>"]
+#else:
+#    raise RuntimeError("Unknown model id")
+ACCEPTS_SYSTEM_MESSAGE = True
+TOKENIZATION_SPACE = "Ġ"
+EOT_TOKEN_SEQUENCE = ["<|eot_id|>"]
+model_id = args.model_path
 
 # function_words = [
 #     "the",
@@ -187,7 +190,7 @@ if not args.use_api:
     tokenizer = llm.get_tokenizer()
 else:
     tokenizer = AutoTokenizer.from_pretrained(model_id)
-    check_if_asr_model_is_right(ASR_MODEL_SIZE)
+    check_if_asr_model_is_right(ASR_MODEL_NAME)
 
 
 def get_last_word(outputs, prompt):
