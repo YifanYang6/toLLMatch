@@ -301,7 +301,7 @@ class SentenceLevelEvaluator(object):
 
         if self.output:
             results.to_csv(self.output / "scores.tsv", sep="\t", index=False)
-            results.to_json(self.output / "scores.json", index=False, orient="records")
+            results.to_json(self.output / "scores.json", orient="records")
 
         logger.info("Results:")
         print(results.to_string(index=False))
