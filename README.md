@@ -49,25 +49,13 @@ We compartmentalize the SiMT system components into three separate sub-systems: 
 
 Start the ASR server (using `whisper-jax`) on the specified device:
 
-```bash
-cd evaluation
-python asr_server.py \
-    --model_size distil-large-v3 \
-    --device 0 \
-    --port <PORT> # must match the port in `ASR_SERVER_ENDPOINT_URL`
-```
-
-The `--model_size` parameter accepts one of the following: `small`, `medium`, `large-v3`, `distil-large-v3`. The first 3 will load the vanilla (relatively large) versions of Whisper and the last one will use the distilled version of the latest `whisper-larger-v3`. `small` is (almost) as good as the others.
-
-
-If you have issues with `jax`, try this alternative ASR server:
 
 ```bash
 cd evaluation
 python asr_server_distil.py \
-    --model_size distil-large-v3 \
+    --model_path <path/to/the/pre/downloaded/model> \
     --device 0 \
-    --port <PORT> # must match the port in `ASR_SERVER_ENDPOINT_URL`
+    --port 8002
 ```
 
 
@@ -77,13 +65,14 @@ The following command will start the LLM server on port `8001`. This port must m
 
 ```bash
 cd evaluation
+source .venv_llm/bin/activate
 volume=<\PATH\TO\YOUR\HUGGINGFACE_CACHE> # must be the same as in `.env`
-LLM_MODEL=meta-llama/Meta-Llama-3-70B-Instruct
+LLM_MODEL=<path/to/the/pre/downloaded/llm/model>
 python3 -m vllm.entrypoints.api_server \
     --model $LLM_MODEL \
     --port 8001 \
-    --tensor-parallel-size 8 \
-    --download-dir $volume \
+    --dtype=half \ # only need to set on V100
+    --tensor-parallel-size 8 \ # change to the number of GPUs you have
     --max-num-seqs 2
 ```
 
