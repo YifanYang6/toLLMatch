@@ -24,6 +24,8 @@ RUN pip install -e ../SimulEval \
     msgpack==1.0.8 chardet==5.2.0 nltk==3.8.1\
     openai==1.23.1 vllm==0.4.1 \
     https://github.com/Dao-AILab/flash-attention/releases/download/v2.5.3/flash_attn-2.5.3+cu122torch2.2cxx11abiFALSE-cp310-cp310-linux_x86_64.whl
+WORKDIR /app/toLLMatch/scripts
+RUN python patch_paths.py
 ### vllm
 #RUN python3.10 -m venv .venv_llm
 #RUN source .venv_llm/bin/activate &&\
