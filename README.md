@@ -65,7 +65,6 @@ The following command will start the LLM server on port `8001`. This port must m
 
 ```bash
 cd evaluation
-source .venv_llm/bin/activate
 volume=<\PATH\TO\YOUR\HUGGINGFACE_CACHE> # must be the same as in `.env`
 LLM_MODEL=<path/to/the/pre/downloaded/llm/model>
 python3 -m vllm.entrypoints.api_server \
